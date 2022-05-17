@@ -45,8 +45,37 @@ Function rowEnd(sheetNum, stRange) As Integer
  
  End Function
  
+ Function initStatusPg()
+    Sheet11.Range("I42").Value = 0
+    Sheet11.Range("H42").Value = 0
+    Sheet11.Range("G42").Value = 0
+    Sheet11.Range("F42").Value = 0
+    Sheet11.Range("E42").Value = 0
+    Sheet11.Range("D42").Value = 0
+    Sheet11.Range("C42").Value = 0
+    Sheet11.Range("B42").Value = 0
+    
+    Sheet11.Range("I43").Value = 0
+    Sheet11.Range("H43").Value = 0
+    Sheet11.Range("G43").Value = 0
+    Sheet11.Range("F43").Value = 0
+    Sheet11.Range("E43").Value = 0
+    Sheet11.Range("D43").Value = 0
+    Sheet11.Range("C43").Value = 0
+    Sheet11.Range("B43").Value = 0
+    
+    Sheet11.Range("J17", "Q17") = 0
+    Sheet11.Range("J18", "Q18") = 0
+    Sheet11.Range("J19", "Q19") = 0
+    Sheet11.Range("J20", "Q20") = 0
+    Sheet11.Range("J21", "Q21") = 0
+    Sheet11.Range("J22", "Q22") = 0
+    Sheet11.Range("J23", "Q23") = 0
+    Sheet11.Range("J24", "Q24") = 0
+ End Function
  
-Sub Squadron_Section_Dict()
+ 
+Sub Squadron_Section_Update()
        
     Dim sectdict As Dictionary
     Set sectdict = New Dictionary
@@ -239,45 +268,57 @@ Sub Highlight_Dates()
     Next ws
 End Sub
 
-Sub Run_Stats()
-    
+Function updateSectionNumbers()
+    'Sub calculates all people in section
     Dim lRow As Integer
-    'Get last row in the "Squadron" Sheet (Sheet2)
+    'SQ Total
     lRow = rowEnd(Sheet2, 7)
-    'Get all members in SQ
-    Sheet11.Range("A40").Value = lRow - 6
-    
+    Sheet11.Range("A42").Value = lRow - 6
+    'CC
     lRow = rowEnd(Sheet3, 2)
-    Sheet11.Range("B40").Value = lRow - 1
-    
+    Sheet11.Range("B42").Value = lRow - 1
+    'CSS
     lRow = rowEnd(Sheet4, 2)
-    Sheet11.Range("C40").Value = lRow - 1
-    
+    Sheet11.Range("C42").Value = lRow - 1
+    'MTF
     lRow = rowEnd(Sheet5, 2)
-    Sheet11.Range("D40").Value = lRow - 1
-    
+    Sheet11.Range("D42").Value = lRow - 1
+    'TRR
     lRow = rowEnd(Sheet6, 2)
-    Sheet11.Range("E40").Value = lRow - 1
-    
+    Sheet11.Range("E42").Value = lRow - 1
+    'TTA
     lRow = rowEnd(Sheet7, 2)
-    Sheet11.Range("F40").Value = lRow - 1
-    
+    Sheet11.Range("F42").Value = lRow - 1
+    'TTB
     lRow = rowEnd(Sheet8, 2)
-    Sheet11.Range("G40").Value = lRow - 1
-    
+    Sheet11.Range("G42").Value = lRow - 1
+    'TTC
     lRow = rowEnd(Sheet9, 2)
-    Sheet11.Range("H40").Value = lRow - 1
-        
+    Sheet11.Range("H42").Value = lRow - 1
+    'TTF
     lRow = rowEnd(Sheet10, 2)
-    Sheet11.Range("I40").Value = lRow - 1
+    Sheet11.Range("I42").Value = lRow - 1
   
-End Sub
+End Function
 
- Sub Overdue_Status_Updater()
+ Sub Update_Status_Page()
     Dim ws As Worksheet
         
     Dim overdue As Integer
     overdue = 0
+    Dim tngDict As Dictionary
+    Set tngDict = New Dictionary
+    'Numbered training that way the program could iterate through
+    'the entries and cells later in the program
+    tngDict.Add 10, 0 'Cyber Awareness
+    tngDict.Add 11, 0 'Force Protection
+    tngDict.Add 12, 0 'SAPR/Suicide Prevention
+    tngDict.Add 13, 0 'CUI
+    tngDict.Add 14, 0 'No FEAR
+    tngDict.Add 15, 0 'Religious Freedom
+    tngDict.Add 16, 0 'OPSEC
+    tngDict.Add 17, 0 'Law of War
+    
     Dim currMon
     Dim currYr
     currMon = Month(Date)
@@ -285,11 +326,23 @@ End Sub
     Dim cellMon
     Dim cellYr
     
+    Call initStatusPg 'Calls Function to initialize certain Cells
+    Call updateSectionNumbers 'Calls Function to check the amount of people
+    
     For Each ws In ThisWorkbook.Worksheets
         If ws.Range("A1").Value = "Name" Then
             Dim lRow As Integer
             lRow = rowEnd(ws, 2)
             overdue = 0
+            tngDict(10) = 0
+            tngDict(11) = 0
+            tngDict(12) = 0
+            tngDict(13) = 0
+            tngDict(14) = 0
+            tngDict(15) = 0
+            tngDict(16) = 0
+            tngDict(17) = 0
+            
             For i = 2 To lRow
                 For j = 2 To 9
                     If IsDate(ws.Cells(i, j).Value) Then
@@ -297,6 +350,25 @@ End Sub
                         cellYr = Year(ws.Cells(i, j).Value)
                         If cellMon < currMon And cellYr = currYr Or cellYr < currYr Then
                             overdue = overdue + 1
+                            If j = 2 Then
+                                tngDict(10) = tngDict(10) + 1
+                            ElseIf j = 3 Then
+                                tngDict(11) = tngDict(11) + 1
+                            ElseIf j = 4 Then
+                                tngDict(12) = tngDict(12) + 1
+                            ElseIf j = 5 Then
+                                tngDict(13) = tngDict(13) + 1
+                            ElseIf j = 6 Then
+                                tngDict(14) = tngDict(14) + 1
+                            ElseIf j = 7 Then
+                                tngDict(15) = tngDict(15) + 1
+                            ElseIf j = 8 Then
+                                tngDict(16) = tngDict(16) + 1
+                            ElseIf j = 9 Then
+                                tngDict(17) = tngDict(17) + 1
+                            Else
+                                Debug.Print "Something went wrong with the TNG Updater"
+                            End If
                         End If
                     End If
                 Next j
@@ -305,26 +377,59 @@ End Sub
 
         If overdue > 0 Then
             If ws.name = "CC" Then
-                Sheet11.Range("B41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(17, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("B43").Value = CStr(overdue)
             ElseIf ws.name = "CSS" Then
-                Sheet11.Range("C41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(18, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("C43").Value = CStr(overdue)
             ElseIf ws.name = "MTF" Then
-                Sheet11.Range("D41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(19, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("D43").Value = CStr(overdue)
             ElseIf ws.name = "TRR" Then
-                Sheet11.Range("E41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(20, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("E43").Value = CStr(overdue)
             ElseIf ws.name = "TTA" Then
-                Sheet11.Range("F41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(21, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("F43").Value = CStr(overdue)
             ElseIf ws.name = "TTB" Then
-                Sheet11.Range("G41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(22, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("G43").Value = CStr(overdue)
             ElseIf ws.name = "TTC" Then
-                Sheet11.Range("H41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(23, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("H43").Value = CStr(overdue)
             ElseIf ws.name = "TTF" Then
-                Sheet11.Range("I41").Value = CStr(overdue)
+                For i = 10 To 17
+                    Sheet11.Cells(24, i).Value = tngDict(i)
+                Next i
+                Sheet11.Range("I43").Value = CStr(overdue)
             Else
                 Debug.Print "Something went wrong with overdue script."
             End If
         End If
     Next ws
-    
-    
+ End Sub
+ 
+ Sub Clear_All()
+    Call Clear_Sq_Pop
+    Call Clear_Sect_Pop
+ End Sub
+ 
+ Sub Update_all()
+    Call Squadron_Section_Update
+    Call Highlight_Dates
+    Call Update_Status_Page
  End Sub
